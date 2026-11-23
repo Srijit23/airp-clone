@@ -122,8 +122,6 @@ export class InspectionPanel {
   refresh() {
     const e = this.engine,
       c = e.controls;
-    $('mode-label').textContent =
-      c.mode === 'fly' ? 'FREE FLIGHT' : 'GROUND LEVEL';
     $('speed-range').value = c.speed;
     $('speed-label').value = Math.round(c.speed) + ' m/s';
     $('debug-check').checked = !$('debug').hidden;
