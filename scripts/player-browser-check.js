@@ -30,7 +30,13 @@ try {
 
   async function loaded(label) {
     try {
-      await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 80000 });
+      await page.waitForFunction(() => {
+        const curtain = document.getElementById('curtain');
+        const message = document.getElementById('status')?.textContent || '';
+        return curtain?.hidden || message.startsWith('Survey unavailable.');
+      }, null, { timeout: 80000 });
+      const status = await page.locator('#status').textContent();
+      if (status?.startsWith('Survey unavailable.')) throw Error(label + ': ' + status);
     } catch (error) {
       console.error(label + ' loading status:', await page.locator('#status').textContent());
       console.error(label + ' observed errors:', errors);
