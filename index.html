@@ -71,7 +71,7 @@
         </div>
         <div>
           <button data-key="Space" aria-label="Ascend">+</button
-          ><button data-key="KeyC" aria-label="Descend">−</button>
+          ><button data-key="KeyC" aria-label="Descend">−</button><button data-key="ShiftLeft" aria-label="Run">Run</button>
         </div>
       </div>
       <output id="debug" hidden></output>
@@ -106,9 +106,9 @@
         </section>
         <section id="settings" hidden>
           <fieldset>
-            <legend>Inspection camera</legend>
+            <legend>Camera mode</legend>
             <div class="segments" id="modes">
-              <button data-mode="fly">Free flight</button
+              <button data-mode="player">Character</button><button data-mode="fly">Free flight</button
               ><button data-mode="ground">Ground level</button>
             </div>
           </fieldset>
@@ -138,8 +138,10 @@
         </section>
         <section id="help" hidden>
           <dl>
-            <dt>Move</dt>
+            <dt>Move character</dt>
             <dd>W A S D</dd>
+            <dt>Run / jump</dt>
+            <dd>Shift / Space</dd>
             <dt>Look around</dt>
             <dd>Click + mouse / arrow keys</dd>
             <dt>Rise / descend in flight</dt>
@@ -148,6 +150,8 @@
             <dd>Shift</dd>
             <dt>Adjust speed</dt>
             <dd>Mouse wheel</dd>
+            <dt>Character / spectator</dt>
+            <dd>V</dd>
             <dt>Flight / ground camera</dt>
             <dd>G</dd>
             <dt>Open atlas</dt>
