@@ -71,7 +71,8 @@ manifest['city-car'] = {
   id: 'city-car',
   type: 'gltf',
   category: 'vehicle',
-  url: import.meta.env.BASE_URL + 'assets/vehicles/dragster.glb',
-  source: 'https://github.com/nbogie/three-js-cars-2/blob/main/models/car2_dragster.glb',
+  draco: true,
+  url: import.meta.env.BASE_URL + 'assets/vehicles/wedge.glb',
+  source: 'https://github.com/drcollect/collect-cars/blob/main/models/wedge.glb',
   license: 'CC-BY-4.0',
 };
