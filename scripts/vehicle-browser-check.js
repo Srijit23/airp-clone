@@ -49,7 +49,7 @@ try {
   await page.goto(url(prod));
   await ready('Production');
   assert.equal(await page.title(), 'AIRP');
-  assert.equal(await page.locator('#vehicle-action').isVisible(), true);
+  assert.equal(await page.locator('#vehicle-action').isVisible(), false);
   // Production GLB is actually available inside the bundled Netlify-style site.
   await page.waitForTimeout(350);
   await page.screenshot({ path: 'test-results/vehicles/parked-production.jpg', quality: 84 });
@@ -63,6 +63,11 @@ try {
     const spawn = { x: e.player.motion.x, z: e.player.motion.z };
     const d = Math.hypot(car.motion.x - spawn.x, car.motion.z - spawn.z);
     const wheels = car.wheels.map(w => ({ name: w.mesh.name, radius: w.radius, y: w.mesh.position.y }));
+    const originalWheelParts = [];
+    car.model.traverse(node => {
+      if (/Wedge_Wheel_(FL|FR|RL|RR)_(Cover|Lip|Tyre)/.test(node.name))
+        originalWheelParts.push(node.name);
+    });
     const center = car.root.position.y;
     const carPosition = { ...car.motion };
     // Approach the actual driver's door with the in-game character.
@@ -77,18 +82,22 @@ try {
       if (door) break;
     }
     if (door) e.player.warp(door.x, door.z, c, true);
-    return { d, wheels, center, parked: car.parked, visible: car.root.visible,
+    return { d, wheels, originalWheelParts, center, parked: car.parked, visible: car.root.visible,
       mode: c.mode, door, canEnter: car.canEnter(), carPosition };
   });
   console.log('Parked car:', JSON.stringify(parked));
   assert.equal(parked.wheels.length, 4);
   assert.equal(new Set(parked.wheels.map(w => w.name)).size, 4);
+  assert.equal(parked.originalWheelParts.length, 12, 'Original 12 wheel meshes were not bundled');
+
   assert.ok(parked.wheels.every(w => w.radius > 0.2 && w.radius < 0.7));
   assert.ok(parked.d < 16 && parked.d > 2, 'Car must spawn near character');
   assert.equal(parked.parked, true);
   assert.equal(parked.visible, true);
   assert.equal(parked.mode, 'player');
   assert.equal(parked.canEnter, true, "Player must be able to approach the driver's door");
+  await page.waitForFunction(() => !document.querySelector('#vehicle-action').hidden, null,
+    { timeout: 120000 });
 
   await page.locator('#world').focus();
   await page.keyboard.press('e');
