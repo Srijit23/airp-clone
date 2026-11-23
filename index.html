@@ -7,7 +7,7 @@
       content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
     <meta name="theme-color" content="#192320" />
-    <title>AIRP • World Explorer</title>
+    <title>AIRP</title>
     <link rel="icon" type="image/svg+xml" href="./mark.svg" />
   </head>
   <body>
@@ -25,7 +25,7 @@
               fill="currentColor"
               d="m1 32 17-29 8 14-4 7-4-7-9 15zm16 0 15-25 14 25h-8l-6-11-6 11z"
             /></svg
-          ><strong>AIRP</strong><i></i><span>World Explorer</span>
+          ><strong>AIRP</strong>
         </div>
         <div class="compass" aria-label="Compass heading">
           <div id="compass-scale"></div>
@@ -44,16 +44,6 @@
           </button>
         </nav>
       </header>
-      <section class="place" aria-label="Current location">
-        <div class="mode-row">
-          <span class="beacon"></span><span id="mode-label">FREE FLIGHT</span
-          ><i></i><span class="muted">CITY SURVEY</span>
-        </div>
-        <h1 id="region-name">Kestrel Basin</h1>
-        <div class="location">
-          <i data-icon="pin"></i><span id="site">Ridge Overlook</span>
-        </div>
-      </section>
       <div id="reticle" aria-hidden="true"></div>
       <aside class="mini">
         <button id="mini-btn" aria-label="Open terrain atlas">
@@ -68,11 +58,6 @@
         </div>
       </aside>
       <footer>
-        <div class="controls">
-          <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span
-          ><span><i data-icon="mouse"></i> Click to look</span
-          ><span><kbd>Shift</kbd> Boost</span>
-        </div>
         <button class="controls-btn" id="help-btn">
           <i data-icon="keyboard"></i> Controls <kbd>?</kbd>
         </button>
@@ -93,7 +78,7 @@
       <dialog id="panel">
         <div class="panel-head">
           <div>
-            <small>AIRP / WORLD EXPLORER</small>
+            <small>AIRP</small>
             <h2 id="panel-title"></h2>
           </div>
           <button id="close" class="square" aria-label="Close panel">
@@ -176,9 +161,16 @@
           </dl>
         </section>
       </dialog>
-      <div id="curtain" role="status">
-        <span class="beacon"></span
-        ><span id="status">Loading Kestrel Basin…</span>
+      <div id="curtain" role="status" aria-live="polite">
+        <div class="loading-brand">
+          <svg class="loading-mark" viewBox="0 0 46 38" aria-hidden="true">
+            <path fill="currentColor" d="m1 32 17-29 8 14-4 7-4-7-9 15zm16 0 15-25 14 25h-8l-6-11-6 11z"/>
+          </svg>
+          <strong>AIRP</strong>
+          <span class="loading-rule" aria-hidden="true"></span>
+          <span id="status">Loading AIRP…</span>
+          <span class="loading-progress" aria-hidden="true"></span>
+        </div>
       </div>
     </main>
     <script type="module" src="./src/main.js"></script>
