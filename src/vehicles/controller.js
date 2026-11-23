@@ -28,29 +28,37 @@ export class VehicleController {
     const handle = await this.assets.acquire('city-car');
     try {
       const model = handle.value.instantiate();
-      // This is Neill Bogie's actual textured GLB, not a procedural car.
-      // Its exported forward is +Z. A 180 degree local turn puts +Z onto
-      // AIRP's forward (-Z) while retaining independent wheel pivots.
+      // Authored 80s Wedge: real-world metres, nose along local +Z.
+      // Align to AIRP's -Z forward without creating/replacing any mesh.
       const bounds = new Box3().setFromObject(model);
       const center = bounds.getCenter(new Vector3());
-      const scale = 1.68; // real-world metres, 3.5 m long and 2.7 m wide
-      model.scale.setScalar(scale);
       model.rotation.y = Math.PI;
-      model.position.set(center.x * scale, -bounds.min.y * scale, center.z * scale);
+      model.position.set(-center.x, -bounds.min.y, -center.z);
+      model.updateMatrixWorld(true);
       model.traverse(node => {
         if (!node.isMesh) return;
         node.castShadow = true;
         node.receiveShadow = true;
       });
-      const wheelNames = ['wheel_fl', 'wheel_fr', 'wheel_bl', 'wheel_br'];
-      for (const name of wheelNames) {
-        const wheel = model.getObjectByName(name);
-        if (!wheel?.isMesh) throw Error('Car GLB is missing independent wheel ' + name);
-        if (!wheel.geometry.boundingBox) wheel.geometry.computeBoundingBox();
-        const box = wheel.geometry.boundingBox;
-        const radius = 0.5 * Math.max(box.max.y - box.min.y, box.max.z - box.min.z) * scale;
-        this.wheels.push({ mesh: wheel, radius, front: name.endsWith('fl') || name.endsWith('fr') });
-        wheel.rotation.order = 'YXZ';
+      // Each wheel comprises three independently authored source objects.
+      // Reparent them around the shared tyre centre as one movable assembly.
+      for (const corner of ['FL', 'FR', 'RL', 'RR']) {
+        const parts = ['Cover', 'Lip', 'Tyre'].map(piece =>
+          model.getObjectByName('Wedge_Wheel_' + corner + '_' + piece));
+        if (parts.some(part => !part?.isMesh))
+          throw Error('Wedge source GLB is missing wheel parts: ' + corner);
+        const tyre = parts[2];
+        const pivot = new Group();
+        pivot.name = 'wheel_' + corner.toLowerCase();
+        pivot.position.copy(tyre.position);
+        pivot.rotation.order = 'YXZ'; // front-steer, then rolling axle motion
+        tyre.parent.add(pivot);
+        model.updateMatrixWorld(true);
+        for (const part of parts) pivot.attach(part);
+        if (!tyre.geometry.boundingBox) tyre.geometry.computeBoundingBox();
+        const b = tyre.geometry.boundingBox;
+        const radius = 0.5 * Math.max(b.max.y - b.min.y, b.max.z - b.min.z);
+        this.wheels.push({ mesh: pivot, radius, front: corner.startsWith('F') });
       }
       this.root.add(model);
       this.model = model;
@@ -68,16 +76,14 @@ export class VehicleController {
     if (!playerMotion) return;
     const yaw = controls.yaw;
     let location = null;
-    for (const distance of [3.8, 4.4, 5.5, 6.7, 8, 10, 12]) {
-      // First try a clear parking spot just ahead and to one side. This keeps
-      // the car visibly framed at first spawn instead of hiding behind the map.
+    for (const distance of [6.2, 7.4, 9, 11, 14]) {
+      // Prefer parking directly ahead, in sight and on clear road surface.
       for (const [lateral, ahead] of [
-        [distance * 0.62, distance * 0.79],
-        [-distance * 0.62, distance * 0.79],
-        [0, distance], [distance * 0.75, distance * 0.65],
-        [-distance * 0.75, distance * 0.65],
-        [distance, 0], [-distance, 0], [0, -distance],
-        [distance * 0.7, -distance * 0.7], [-distance * 0.7, -distance * 0.7],
+        [0, distance], [-1.25, distance], [1.25, distance],
+        [-distance, 0], [distance, 0],
+        [-distance * 0.6, distance * 0.7],
+        [distance * 0.6, distance * 0.7],
+        [0, -distance],
       ]) {
         const position = offset(playerMotion.x, playerMotion.z, yaw, lateral, ahead);
         if (!this.world.blocked(position.x, position.z, yaw)) {
