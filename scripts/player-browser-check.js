@@ -90,6 +90,10 @@ try {
     const propBlocked = placedSolid && p.world.solidProp(
       placedSolid.m.elements[12], placedSolid.m.elements[14], placedSolid.m.elements[13]
     );
+    const visualHeight = Math.max(...worldBoxes.map(b => b.high[1])) -
+      Math.min(...worldBoxes.map(b => b.low[1]));
+    const meshesOnScreen = worldBoxes.filter(b => Math.abs(b.ndc[0]) < 0.95 &&
+      Math.abs(b.ndc[1]) < 0.95 && b.ndc[2] > -1 && b.ndc[2] < 1).length;
     const centerDistance = Math.hypot(e.camera.position.x - p.motion.x, e.camera.position.z - p.motion.z);
     const modelVisible = p.root.visible && p.model.visible;
     const worldBoxes = [];
@@ -113,7 +117,8 @@ try {
     return { start: [start.x,start.y,start.z], walked, ran, walkAnimation, runAnimation,
       jumpAnimation, peak, landed, blocked, propBlocked, centerDistance, modelVisible, fly, restored,
       clips: p.actions.size, assets: e.assets.entries.size,
-      meshes:worldBoxes.length, boxes:worldBoxes.slice(0,7),
+      meshes:worldBoxes.length, visualHeight, meshesOnScreen,
+      boxes:worldBoxes.slice(0,7),
       cameraPosition:e.camera.position.toArray().map(x=>Number(x.toFixed(2))),
       cameraTarget:[p.motion.x,p.motion.y+1.43,p.motion.z] };
   });
@@ -129,6 +134,9 @@ try {
   assert.equal(result.propBlocked, true, 'Authored solid prop collider did not engage');
   assert.ok(result.centerDistance > 1 && result.centerDistance < 9);
   assert.equal(result.modelVisible, true);
+  assert.ok(result.visualHeight > 1.2 && result.visualHeight < 2.5,
+    'Actual rigged mesh is not human-sized: ' + result.visualHeight);
+  assert.ok(result.meshesOnScreen >= 8, 'Character meshes are not visible in the camera frame');
   assert.equal(result.fly, true);
   assert.equal(result.restored, true);
   assert.ok(result.clips >= 5);
