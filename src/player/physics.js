@@ -51,7 +51,8 @@ export function advanceMotion(s, input, dt, world) {
       const nextFloor = world.height(nx, nz);
       const delta = Math.hypot(nx - s.x, nz - s.z);
       const climb = nextFloor - ground;
-      const tooSteep = s.grounded && climb > 0.08 && climb / Math.max(delta, 0.001) > MAX_SLOPE;
+      // Allow small kerbs and pavement lips; block tall, near-vertical terrain rises.
+      const tooSteep = s.grounded && climb > 0.24 && climb / Math.max(delta, 0.001) > MAX_SLOPE;
       const tooHigh = nextFloor - s.y > (s.grounded ? STEP_HEIGHT : 0.05);
       if (tooSteep || tooHigh || world.blocked(nx, nz, s.y)) {
         if (axis === 'x') s.vx = 0;
