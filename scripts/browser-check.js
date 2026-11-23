@@ -118,6 +118,7 @@ try {
   await page.keyboard.press('m');
   await page.locator('#stations').getByText('Basin Boulevard').click();
   await ready();
+  await page.keyboard.press('v'); // Leave the character view for the legacy spectator check.
   await page.keyboard.press('g');
   await page.waitForFunction(
     () => document.querySelector('[data-mode="ground"]').getAttribute('aria-pressed') === 'true',
