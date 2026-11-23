@@ -32,7 +32,11 @@ export function advanceVehicle(s, input, dt, world) {
   const brake = Boolean(input.brake);
   const oldSpeed = s.speed;
 
-  const maxSteer = MAX_STEER / (1 + Math.abs(s.speed) * 0.031);
+  // Tight parking turns at low speeds, progressively calmer steering at
+  // city speeds. The non-linear falloff prevents snap turns when sprinting
+  // across multi-lane streets at 60+ km/h.
+  const speedFactor = Math.abs(s.speed) / 10;
+  const maxSteer = MAX_STEER / (1 + 2.4 * speedFactor ** 1.3);
   const desired = turn * maxSteer;
   s.steer += (desired - s.steer) * (1 - Math.exp(-dt * 9));
 
