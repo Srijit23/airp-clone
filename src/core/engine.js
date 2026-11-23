@@ -96,7 +96,7 @@ export class Engine {
     this.controls.teleport(station);
     this.waitForTerrain = true;
     document.querySelector('#curtain').hidden = false;
-    document.querySelector('#status').textContent = 'Loading survey point…';
+    document.querySelector('#status').textContent = 'Loading AIRP…';
   }
   frame(time) {
     const elapsed = this.last ? (time - this.last) / 1000 : 1 / 60;
