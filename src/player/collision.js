@@ -56,7 +56,8 @@ export class CharacterWorld {
     return this.controls.height(x, z);
   }
 
-  blocked(x, z, footY) {
+  blocked(x, z, footY, ignoreVehicle = false) {
+    if (!ignoreVehicle && this.vehicle?.occupies(x, z, BODY_RADIUS)) return true;
     const building = buildingAt(x, z, BODY_RADIUS);
     if (building && footY < building.position.y + building.height &&
         footY + BODY_HEIGHT > building.position.y) return true;
