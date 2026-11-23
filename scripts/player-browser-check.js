@@ -24,17 +24,27 @@ try {
   });
   const page = await browser.newPage({ viewport: { width: 960, height: 600 } });
   page.setDefaultTimeout(120000);
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', item => { if (item.type() === 'error') errors.push(item.text()); });
+  page.on('pageerror', error => { errors.push(error.message); console.error('PAGE ERROR', error.message); });
+  page.on('console', item => { if (item.type() === 'error') { errors.push(item.text()); console.error('BROWSER ERROR', item.text().slice(0, 1500)); } });
   page.on('response', response => { if (response.status() >= 400) errors.push(response.status() + ' ' + response.url()); });
 
+  async function loaded(label) {
+    try {
+      await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 80000 });
+    } catch (error) {
+      console.error(label + ' loading status:', await page.locator('#status').textContent());
+      console.error(label + ' observed errors:', errors);
+      await page.screenshot({ path: 'test-results/player/startup-diagnostics.jpg', quality: 80 });
+      throw error;
+    }
+  }
   await page.goto(address(prod));
-  await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 120000 });
+  await loaded('Production');
   assert.equal(await page.title(), 'AIRP');
   assert.equal(await page.locator('[data-mode="player"]').getAttribute('aria-pressed'), 'true');
   await page.screenshot({ path: 'test-results/player/character-production.jpg', quality: 88 });
   await page.goto(address(dev));
-  await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 120000 });
+  await loaded('Development');
   await page.waitForFunction(() => window.airp?.player?.model && airp.player.enabled);
   const result = await page.evaluate(async () => {
     const e = window.airp, c = e.controls, p = e.player;
