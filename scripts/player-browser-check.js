@@ -82,6 +82,13 @@ try {
     const landed = p.motion.grounded && Math.abs(p.motion.y - p.world.height(p.motion.x, p.motion.z)) < 0.001;
     const building = buildings.find(b => buildingAt(b.position.x, b.position.z) === b);
     const blocked = p.world.blocked(building.position.x, building.position.z, building.position.y);
+    const placedSolid = e.places.lots.flatMap(lot => lot.parts).find(part =>
+      part.asset === 'solid' && Math.abs(part.m.elements[5]) > 0.42 &&
+      Math.hypot(part.m.elements[8], part.m.elements[10]) > 2
+    );
+    const propBlocked = placedSolid && p.world.solidProp(
+      placedSolid.m.elements[12], placedSolid.m.elements[14], placedSolid.m.elements[13]
+    );
     const centerDistance = Math.hypot(e.camera.position.x - p.motion.x, e.camera.position.z - p.motion.z);
     const modelVisible = p.root.visible && p.model.visible;
     c.setMode('fly');
@@ -89,7 +96,7 @@ try {
     c.setMode('player');
     const restored = c.mode === 'player' && p.root.visible;
     return { start: [start.x,start.y,start.z], walked, ran, walkAnimation, runAnimation,
-      jumpAnimation, peak, landed, blocked, centerDistance, modelVisible, fly, restored,
+      jumpAnimation, peak, landed, blocked, propBlocked, centerDistance, modelVisible, fly, restored,
       clips: p.actions.size, assets: e.assets.entries.size };
   });
   console.log('Character browser metrics:', result);
@@ -101,6 +108,7 @@ try {
   assert.ok(result.peak > 0.85, 'Jump did not leave the terrain');
   assert.equal(result.landed, true, 'Character did not land on the surface');
   assert.equal(result.blocked, true, 'Building collider did not engage');
+  assert.equal(result.propBlocked, true, 'Authored solid prop collider did not engage');
   assert.ok(result.centerDistance > 1 && result.centerDistance < 9);
   assert.equal(result.modelVisible, true);
   assert.equal(result.fly, true);
