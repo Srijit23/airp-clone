@@ -1,0 +1,37 @@
+name: Character controller verification
+on:
+  push:
+    branches: [ui/airp-game-ready-cleanup]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/assets/characters/**'
+      - 'scripts/player-browser-check.js'
+      - 'test/**'
+      - '.github/workflows/character-verification.yml'
+permissions:
+  contents: read
+jobs:
+  player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright-core install --with-deps chromium
+      - name: Verify animated character in Chromium
+        run: node scripts/player-browser-check.js
+        env:
+          AIRP_SOFTWARE_GL: '1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: player-browser-captures
+          path: test-results/player/
