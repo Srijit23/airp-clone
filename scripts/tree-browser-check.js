@@ -41,7 +41,7 @@ try {
   assert.ok(requests.length >= 5);
   assert.equal(new Set(requests).size, 5);
   await page.keyboard.press('g');
-  await page.waitForFunction(() => document.querySelector('#mode-label').textContent === 'GROUND LEVEL');
+  await page.waitForFunction(() => document.querySelector('[data-mode="ground"]').getAttribute('aria-pressed') === 'true');
   await page.screenshot({ path: out + '/atlas-arrival.jpg', quality: 90 });
   console.log('Production atlas loaded all five local GLBs.');
 
