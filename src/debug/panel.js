@@ -1,8 +1,6 @@
-import {regionAt} from '../world/regions.js';
-import { stations, district } from '../data/world.js';
+import { district } from '../data/world.js';
 import { Atlas } from './atlas.js';
 import { PlanOverlay, layers } from './city-plan.js';
-import { zoneAt, zones,zoneAreas,inside } from '../roads/parcels.js';
 import { icons } from './icons.js';
 
 const $ = (id) => document.getElementById(id);
@@ -145,16 +143,6 @@ export class InspectionPanel {
     const e = this.engine,
       c = e.controls,
       p = e.camera.position;
-    $('region-name').textContent=regionAt(p.x,p.z);
-    const nearest = stations.reduce((a, s) =>
-      Math.hypot(p.x - a.x, p.z - a.z) < Math.hypot(p.x - s.x, p.z - s.z)
-        ? a
-        : s,
-    );
-    $('site').textContent =
-      Math.hypot(p.x - nearest.x, p.z - nearest.z) < 210
-        ? nearest.name
-        : (zoneAreas.find(a=>a.name&&inside(p,a.points))?.name || (zoneAt(p)==='green'?regionAt(p.x,p.z):zones[zoneAt(p)].name));
     $('alt').textContent = Math.round(p.y);
     $('speed').textContent = Math.round(c.travelSpeed);
     const bearing = ((((-c.yaw * 180) / Math.PI) % 360) + 360) % 360;
@@ -174,7 +162,7 @@ export class InspectionPanel {
       const r = e.renderer.info,
         s = e.streamer;
       $('debug').textContent = [
-        district.name + '  /  ' + e.presetName,
+        'AIRP  /  ' + e.presetName,
         'XYZ  ' + [p.x, p.y, p.z].map((n) => n.toFixed(1)).join('  ') + ' m',
         fps.toFixed(1) + ' FPS    ' + ms.toFixed(1) + ' ms/frame',
         r.render.calls +
