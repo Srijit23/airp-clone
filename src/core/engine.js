@@ -191,5 +191,6 @@ export class Engine {
     this.atmosphere.dispose();
     this.terrain?.dispose();
     this.renderer.dispose();
+    this.assets?.dispose();
   }
 }
