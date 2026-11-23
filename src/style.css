@@ -787,3 +787,70 @@ body.locked .controls > span:nth-child(2) {
 #city-layers input {
   accent-color: #cde88e;
 }
+
+
+/* Vehicle interaction stays quiet until the player reaches the parked car. */
+.vehicle-hud {
+  position: absolute;
+  left: 34px;
+  bottom: 80px;
+  z-index: 2;
+  pointer-events: none;
+  padding: 11px 15px 12px;
+  border-radius: 9px;
+  border: 1px solid #dfedcc52;
+  background: #172520d9;
+  backdrop-filter: blur(7px);
+}
+.vehicle-hud-label {
+  display: block;
+  font: 10px/1.3 Consolas, monospace;
+  letter-spacing: 1.2px;
+  color: var(--lime);
+}
+.vehicle-hud > div {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 2px;
+}
+.vehicle-hud strong {
+  font: 700 37px/1.15 Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.vehicle-hud > div > span {
+  font: 11px Consolas, monospace;
+  color: #f0f3e2b8;
+}
+.vehicle-action {
+  position: absolute;
+  bottom: 73px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #1b2a24e8;
+  backdrop-filter: blur(9px);
+  padding: 9px 13px;
+  border: 1px solid #e8f2d777;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.vehicle-action:hover { background: #314336; }
+.vehicle-action kbd {
+  font-size: 11px;
+  border-color: #d2ef9180;
+  color: var(--lime);
+}
+@media (max-width: 760px) {
+  .vehicle-hud { left: 17px; bottom: 72px; padding: 8px 11px; }
+  .vehicle-hud strong { font-size: 28px; }
+  .vehicle-action { bottom: 66px; }
+}
+@media (pointer: coarse) {
+  .vehicle-action { bottom: 136px; }
+  .vehicle-hud { bottom: 168px; }
+}
