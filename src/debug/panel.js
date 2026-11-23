@@ -73,6 +73,7 @@ export class InspectionPanel {
         if (this.dialog.open) return;
         if (e.key === '?') this.open('help');
         if (e.code === 'KeyG') c.setMode(c.mode === 'fly' ? 'ground' : 'fly');
+        if (e.code === 'KeyV') c.setMode(c.mode === 'player' ? 'fly' : 'player');
         if (e.code === 'F3') {
           e.preventDefault();
           $('debug').hidden = !$('debug').hidden;
