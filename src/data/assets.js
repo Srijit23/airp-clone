@@ -66,3 +66,12 @@ manifest['player-robot'] = {
   source: 'https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive',
   license: 'CC0-1.0',
 };
+
+manifest['city-car'] = {
+  id: 'city-car',
+  type: 'gltf',
+  category: 'vehicle',
+  url: import.meta.env.BASE_URL + 'assets/vehicles/dragster.glb',
+  source: 'https://github.com/nbogie/three-js-cars-2/blob/main/models/car2_dragster.glb',
+  license: 'CC-BY-4.0',
+};
