@@ -6,7 +6,6 @@ import { CharacterWorld } from './collision.js';
 const focus = new Vector3();
 const orbit = new Vector3();
 const point = new Vector3();
-const FORWARD_DISTANCE = 4.6;
 
 function turnTowards(from, to, amount) {
   const delta = Math.atan2(Math.sin(to - from), Math.cos(to - from));
@@ -26,6 +25,7 @@ export class CharacterController {
     this.currentSpeed = 0;
     this.moving = false;
     this.shadowSeconds = 0;
+    this.cameraDistance = 4.6;
   }
 
   async load() {
@@ -133,9 +133,9 @@ export class CharacterController {
     const yaw = controls.yaw;
     const pitch = Math.max(-0.85, Math.min(0.3, controls.pitch));
     orbit.set(
-      focus.x + Math.sin(yaw) * FORWARD_DISTANCE * Math.cos(pitch),
+      focus.x + Math.sin(yaw) * this.cameraDistance * Math.cos(pitch),
       focus.y - Math.sin(pitch) * FORWARD_DISTANCE,
-      focus.z + Math.cos(yaw) * FORWARD_DISTANCE * Math.cos(pitch),
+      focus.z + Math.cos(yaw) * this.cameraDistance * Math.cos(pitch),
     );
 
     // Shorten the chase boom if hills, road embankments or buildings occlude it.
