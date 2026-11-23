@@ -149,7 +149,7 @@ export class CharacterController {
     const pitch = Math.max(-0.85, Math.min(0.3, controls.pitch));
     orbit.set(
       focus.x + Math.sin(yaw) * this.cameraDistance * Math.cos(pitch),
-      focus.y - Math.sin(pitch) * FORWARD_DISTANCE,
+      focus.y - Math.sin(pitch) * this.cameraDistance,
       focus.z + Math.cos(yaw) * this.cameraDistance * Math.cos(pitch),
     );
 
