@@ -90,10 +90,6 @@ try {
     const propBlocked = placedSolid && p.world.solidProp(
       placedSolid.m.elements[12], placedSolid.m.elements[14], placedSolid.m.elements[13]
     );
-    const visualHeight = Math.max(...worldBoxes.map(b => b.high[1])) -
-      Math.min(...worldBoxes.map(b => b.low[1]));
-    const meshesOnScreen = worldBoxes.filter(b => Math.abs(b.ndc[0]) < 0.95 &&
-      Math.abs(b.ndc[1]) < 0.95 && b.ndc[2] > -1 && b.ndc[2] < 1).length;
     const centerDistance = Math.hypot(e.camera.position.x - p.motion.x, e.camera.position.z - p.motion.z);
     const modelVisible = p.root.visible && p.model.visible;
     const worldBoxes = [];
@@ -110,6 +106,10 @@ try {
         ndc:projected.toArray().map(x=>Number(x.toFixed(2))),
       });
     });
+    const visualHeight = Math.max(...worldBoxes.map(b => b.high[1])) -
+      Math.min(...worldBoxes.map(b => b.low[1]));
+    const meshesOnScreen = worldBoxes.filter(b => Math.abs(b.ndc[0]) < 0.95 &&
+      Math.abs(b.ndc[1]) < 0.95 && b.ndc[2] > -1 && b.ndc[2] < 1).length;
     c.setMode('fly');
     const fly = c.mode === 'fly' && !p.root.visible;
     c.setMode('player');
