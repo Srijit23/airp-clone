@@ -39,6 +39,14 @@ export class VehicleController {
         if (!node.isMesh) return;
         node.castShadow = true;
         node.receiveShadow = true;
+        // The source defaults to near-black. A metallic deep-blue finish
+        // reads clearly against AIRP's dark roads without replacing geometry.
+        for (const material of [].concat(node.material || [])) {
+          if (material.name !== 'Wedge_Paint') continue;
+          material.color.set('#538dbb');
+          material.metalness = 0.42;
+          material.roughness = 0.28;
+        }
       });
       // Each wheel comprises three independently authored source objects.
       // Reparent them around the shared tyre centre as one movable assembly.
@@ -79,6 +87,7 @@ export class VehicleController {
     for (const distance of [6.2, 7.4, 9, 11, 14]) {
       // Prefer parking directly ahead, in sight and on clear road surface.
       for (const [lateral, ahead] of [
+        [2.1, distance * 0.96], [-2.1, distance * 0.96],
         [0, distance], [-1.25, distance], [1.25, distance],
         [-distance, 0], [distance, 0],
         [-distance * 0.6, distance * 0.7],
