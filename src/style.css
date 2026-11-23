@@ -381,6 +381,7 @@ footer {
   bottom: 0;
   height: 59px;
   border-top: 1px solid #ffffff33;
+  justify-content: flex-end;
 }
 .controls {
   gap: 25px;
@@ -564,6 +565,68 @@ dd {
   justify-content: center;
   font-size: 14px;
   z-index: 5;
+}
+/* Self-contained AIRP startup identity, without changes to the world renderer. */
+.loading-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.loading-mark {
+  width: 75px;
+  height: 63px;
+  color: var(--lime);
+  filter: drop-shadow(0 0 26px #d2ef9133);
+}
+.loading-brand strong {
+  font-family: Arial, sans-serif;
+  font-size: clamp(58px, 12vw, 94px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.085em;
+  line-height: 1;
+  padding-right: 0.1em;
+}
+.loading-rule {
+  height: 1px;
+  width: 132px;
+  background: linear-gradient(90deg, transparent, #d2ef91a8, transparent);
+  margin: 4px 0;
+}
+#status {
+  color: #e4eddc;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+.loading-progress {
+  position: relative;
+  overflow: hidden;
+  width: 145px;
+  height: 2px;
+  background: #ffffff24;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+.loading-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -42%;
+  width: 42%;
+  background: var(--lime);
+  border-radius: inherit;
+  animation: airp-loading 1.5s ease-in-out infinite;
+}
+@keyframes airp-loading {
+  to { left: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-progress::after { animation: none; left: 0; width: 100%; }
 }
 #curtain[hidden],
 [hidden] {
