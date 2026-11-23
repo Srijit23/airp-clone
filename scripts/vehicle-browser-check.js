@@ -70,6 +70,8 @@ try {
     });
     const center = car.root.position.y;
     const carPosition = { ...car.motion };
+    const parkedCollision = e.player.world.blocked(car.motion.x, car.motion.z,
+      e.player.world.height(car.motion.x, car.motion.z));
     // Approach the actual driver's door with the in-game character.
     let door = null;
     for (const gap of [CAR_WIDTH * 0.5 + 1.0, 3.0, 3.6]) {
@@ -83,7 +85,7 @@ try {
     }
     if (door) e.player.warp(door.x, door.z, c, true);
     return { d, wheels, originalWheelParts, center, parked: car.parked, visible: car.root.visible,
-      mode: c.mode, door, canEnter: car.canEnter(), carPosition };
+      mode: c.mode, door, canEnter: car.canEnter(), parkedCollision, carPosition };
   });
   console.log('Parked car:', JSON.stringify(parked));
   assert.equal(parked.wheels.length, 4);
@@ -93,6 +95,7 @@ try {
   assert.ok(parked.wheels.every(w => w.radius > 0.2 && w.radius < 0.7));
   assert.ok(parked.d < 16 && parked.d > 2, 'Car must spawn near character');
   assert.equal(parked.parked, true);
+  assert.equal(parked.parkedCollision, true, 'On-foot character must not pass through car');
   assert.equal(parked.visible, true);
   assert.equal(parked.mode, 'player');
   assert.equal(parked.canEnter, true, "Player must be able to approach the driver's door");
