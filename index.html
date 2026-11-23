@@ -57,6 +57,13 @@
           ><span><i data-icon="speed"></i><b id="speed">48</b> m/s</span>
         </div>
       </aside>
+      <aside id="vehicle-hud" class="vehicle-hud" hidden aria-label="Vehicle dashboard">
+        <span class="vehicle-hud-label">AIRP / DRIVE</span>
+        <div><strong id="vehicle-speed">0</strong><span>km/h</span></div>
+      </aside>
+      <button id="vehicle-action" class="vehicle-action" hidden aria-label="Enter or exit car">
+        <kbd>E</kbd><span id="vehicle-action-text">Enter car</span>
+      </button>
       <footer>
         <button class="controls-btn" id="help-btn">
           <i data-icon="keyboard"></i> Controls <kbd>?</kbd>
@@ -138,6 +145,14 @@
         </section>
         <section id="help" hidden>
           <dl>
+            <dt>Enter / exit parked car</dt>
+            <dd>E (near car)</dd>
+            <dt>Drive / steer</dt>
+            <dd>W S / A D</dd>
+            <dt>Handbrake / reverse</dt>
+            <dd>Space / S</dd>
+            <dt>Car chase camera zoom</dt>
+            <dd>Mouse wheel</dd>
             <dt>Move character</dt>
             <dd>W A S D</dd>
             <dt>Run / jump</dt>
