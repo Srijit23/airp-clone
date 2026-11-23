@@ -34,13 +34,26 @@ export class CharacterController {
     try {
       const resource = this.handle.value;
       this.model = resource.instantiate();
-      const bbox = new Box3().setFromObject(this.model);
+      // Box3.setFromObject() uses the animated SkinnedMesh bounds, which
+      // can be massively overinflated for this GLB's 100x armature. Normalize
+      // from the real render meshes in their bind-space node transforms.
+      this.model.updateMatrixWorld(true);
+      const bbox = new Box3().makeEmpty();
+      this.model.traverse(node => {
+        if (!node.isMesh) return;
+        if (!node.geometry.boundingBox) node.geometry.computeBoundingBox();
+        bbox.union(node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld));
+      });
       const dimensions = bbox.getSize(new Vector3());
       if (!Number.isFinite(dimensions.y) || dimensions.y < 0.01)
         throw Error('Animated character is missing valid mesh bounds');
       const scale = 1.78 / dimensions.y;
       this.model.scale.multiplyScalar(scale);
-      this.model.position.y = -bbox.min.y * scale;
+      this.model.position.set(
+        -0.5 * (bbox.min.x + bbox.max.x) * scale,
+        -bbox.min.y * scale,
+        -0.5 * (bbox.min.z + bbox.max.z) * scale,
+      );
       this.model.traverse(node => {
         if (!node.isMesh) return;
         node.castShadow = true;
