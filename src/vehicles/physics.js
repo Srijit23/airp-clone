@@ -1,15 +1,15 @@
 // Signed-speed bicycle handling in metres/seconds; no physics-library timestep drift.
 // +steering turns the car left; yaw=0 faces world north (-Z).
-export const CAR_LENGTH = 3.65;
-export const CAR_WIDTH = 2.72;
-export const WHEELBASE = 2.42;
-export const WHEEL_TRACK = 1.85;
-export const WHEEL_RADIUS = 0.37;
+export const CAR_LENGTH = 4.40;
+export const CAR_WIDTH = 1.94;
+export const WHEELBASE = 2.75;
+export const WHEEL_TRACK = 1.63;
+export const WHEEL_RADIUS = 0.36;
 export const MAX_FORWARD = 28;   // 101 km/h
 export const MAX_REVERSE = 9;
 export const MAX_STEER = 0.55;
 export const DRIVE_LIMIT = 4864 - 2.5;
-export const CAR_HEIGHT = 1.65;
+export const CAR_HEIGHT = 1.22;
 
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 const towardZero = (v, amount) => Math.sign(v) * Math.max(0, Math.abs(v) - amount);
