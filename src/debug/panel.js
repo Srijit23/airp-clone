@@ -33,6 +33,10 @@ export class InspectionPanel {
     for (const t of ['atlas', 'settings', 'help'])
       $(t + '-btn').onclick = () => this.open(t);
     $('mini-btn').onclick = () => this.open('atlas');
+    $('vehicle-action').onclick = () => {
+      engine.vehicle?.toggle(c);
+      this.refreshVehicle();
+    };
     $('close').onclick = () => this.close();
     this.dialog.addEventListener('close', () => {
       c.suspend(false);
@@ -72,8 +76,16 @@ export class InspectionPanel {
         }
         if (this.dialog.open) return;
         if (e.key === '?') this.open('help');
-        if (e.code === 'KeyG') c.setMode(c.mode === 'fly' ? 'ground' : 'fly');
-        if (e.code === 'KeyV') c.setMode(c.mode === 'player' ? 'fly' : 'player');
+        if (e.code === 'KeyE') {
+          if (engine.vehicle?.toggle(c)) {
+            e.preventDefault();
+            this.refreshVehicle();
+          }
+        }
+        if (e.code === 'KeyG' && c.mode !== 'drive')
+          c.setMode(c.mode === 'fly' ? 'ground' : 'fly');
+        if (e.code === 'KeyV')
+          c.setMode(c.mode === 'drive' ? 'player' : c.mode === 'player' ? 'fly' : 'player');
         if (e.code === 'F3') {
           e.preventDefault();
           $('debug').hidden = !$('debug').hidden;
@@ -137,13 +149,25 @@ export class InspectionPanel {
         b.setAttribute('aria-pressed', b.dataset.quality === e.presetName),
       );
     document.body.classList.toggle('locked', c.active);
+    this.refreshVehicle();
   }
+  refreshVehicle() {
+    const car = this.engine.vehicle;
+    const driving = !!car?.driving;
+    $('vehicle-hud').hidden = !driving;
+    $('vehicle-speed').textContent = car?.speedKmh ?? 0;
+    const interaction = $('vehicle-action');
+    interaction.hidden = !(driving || car?.canEnter());
+    $('vehicle-action-text').textContent = driving ? 'Exit car' : 'Enter car';
+  }
+
   update(fps, ms) {
     const e = this.engine,
       c = e.controls,
       p = e.camera.position;
     $('alt').textContent = Math.round(p.y);
     $('speed').textContent = Math.round(c.travelSpeed);
+    this.refreshVehicle();
     const bearing = ((((-c.yaw * 180) / Math.PI) % 360) + 360) % 360;
     $('heading').textContent =
       String(Math.round(bearing) % 360).padStart(3, '0') + '°';
