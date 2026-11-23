@@ -50,8 +50,23 @@ export class CharacterController {
       this.scene.add(this.root);
       this.mixer = new AnimationMixer(this.model);
       this.actions = new Map();
-      for (const clip of resource.animations)
+      // The source Jump and Running clips animate the Body bone vertically.
+      // Keep their authored poses but remove most of that local root translation:
+      // the collision capsule/physics already supplies actual world displacement.
+      const bodyRestY = this.model.getObjectByName('Body')?.position.y;
+      for (const source of resource.animations) {
+        const clip = source.clone();
+        const weight = ['Jump', 'WalkJump'].includes(clip.name) ? 0.1 :
+          clip.name === 'Running' ? 0.28 : 1;
+        if (bodyRestY !== undefined && weight !== 1) {
+          for (const track of clip.tracks) {
+            if (!track.name.endsWith('Body.position')) continue;
+            for (let i = 1; i < track.values.length; i += 3)
+              track.values[i] = bodyRestY + (track.values[i] - bodyRestY) * weight;
+          }
+        }
         this.actions.set(clip.name, this.mixer.clipAction(clip));
+      }
       for (const name of ['Idle', 'Walking', 'Running', 'Jump', 'WalkJump'])
         if (!this.actions.has(name)) throw Error('Character animation missing: ' + name);
       for (const name of ['Jump', 'WalkJump']) {
@@ -178,7 +193,7 @@ export class CharacterController {
       this.model.rotation.y = this.heading;
     }
     if (!this.motion.grounded) {
-      if (result.jumped)
+      if (result.jumped || !['Jump', 'WalkJump'].includes(this.actionName))
         this.play(result.moving ? 'WalkJump' : 'Jump', 0.11);
     } else {
       this.play(result.speed < 0.35 ? 'Idle' :
