@@ -5,6 +5,7 @@ import { CharacterWorld } from './collision.js';
 
 const focus = new Vector3();
 const orbit = new Vector3();
+const desired = new Vector3();
 const point = new Vector3();
 
 function turnTowards(from, to, amount) {
@@ -147,7 +148,7 @@ export class CharacterController {
     focus.set(s.x, s.y + 1.43, s.z);
     const yaw = controls.yaw;
     const pitch = Math.max(-0.85, Math.min(0.3, controls.pitch));
-    orbit.set(
+    desired.set(
       focus.x + Math.sin(yaw) * this.cameraDistance * Math.cos(pitch),
       focus.y - Math.sin(pitch) * this.cameraDistance,
       focus.z + Math.cos(yaw) * this.cameraDistance * Math.cos(pitch),
@@ -157,7 +158,7 @@ export class CharacterController {
     let fraction = 1;
     for (let i = 1; i <= 16; i++) {
       const t = i / 16;
-      point.copy(focus).lerp(orbit, t);
+      point.copy(focus).lerp(desired, t);
       const obstacle = buildingAt(point.x, point.z, 0.16);
       if (point.y < this.world.height(point.x, point.z) + 0.22 ||
           (obstacle && point.y < obstacle.position.y + obstacle.height &&
@@ -166,7 +167,7 @@ export class CharacterController {
         break;
       }
     }
-    orbit.copy(focus).lerp(orbit, fraction);
+    orbit.copy(focus).lerp(desired, fraction);
     orbit.y = Math.max(orbit.y, this.world.height(orbit.x, orbit.z) + 0.26);
     if (dt === 0) camera.position.copy(orbit);
     else camera.position.lerp(orbit, 1 - Math.exp(-dt * 10));
