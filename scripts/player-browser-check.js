@@ -29,12 +29,12 @@ try {
   page.on('response', response => { if (response.status() >= 400) errors.push(response.status() + ' ' + response.url()); });
 
   await page.goto(address(prod));
-  await page.waitForSelector('#curtain[hidden]', { timeout: 120000 });
+  await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 120000 });
   assert.equal(await page.title(), 'AIRP');
   assert.equal(await page.locator('[data-mode="player"]').getAttribute('aria-pressed'), 'true');
   await page.screenshot({ path: 'test-results/player/character-production.jpg', quality: 88 });
   await page.goto(address(dev));
-  await page.waitForSelector('#curtain[hidden]', { timeout: 120000 });
+  await page.waitForSelector('#curtain[hidden]', { state: 'attached', timeout: 120000 });
   await page.waitForFunction(() => window.airp?.player?.model && airp.player.enabled);
   const result = await page.evaluate(async () => {
     const e = window.airp, c = e.controls, p = e.player;
