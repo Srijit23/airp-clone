@@ -48,6 +48,7 @@ try {
   await loaded('Production');
   assert.equal(await page.title(), 'AIRP');
   assert.equal(await page.locator('[data-mode="player"]').getAttribute('aria-pressed'), 'true');
+  await page.waitForTimeout(650);
   await page.screenshot({ path: 'test-results/player/character-production.jpg', quality: 88 });
   await page.goto(address(dev));
   await loaded('Development');
@@ -91,13 +92,30 @@ try {
     );
     const centerDistance = Math.hypot(e.camera.position.x - p.motion.x, e.camera.position.z - p.motion.z);
     const modelVisible = p.root.visible && p.model.visible;
+    const worldBoxes = [];
+    p.model.updateMatrixWorld(true);
+    p.model.traverse(node => {
+      if (!node.isMesh) return;
+      if (!node.geometry.boundingBox) node.geometry.computeBoundingBox();
+      const b = node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld);
+      const center = b.min.clone().add(b.max).multiplyScalar(0.5);
+      const projected = center.clone().project(e.camera);
+      worldBoxes.push({name:node.name,
+        low:b.min.toArray().map(x=>Number(x.toFixed(2))),
+        high:b.max.toArray().map(x=>Number(x.toFixed(2))),
+        ndc:projected.toArray().map(x=>Number(x.toFixed(2))),
+      });
+    });
     c.setMode('fly');
     const fly = c.mode === 'fly' && !p.root.visible;
     c.setMode('player');
     const restored = c.mode === 'player' && p.root.visible;
     return { start: [start.x,start.y,start.z], walked, ran, walkAnimation, runAnimation,
       jumpAnimation, peak, landed, blocked, propBlocked, centerDistance, modelVisible, fly, restored,
-      clips: p.actions.size, assets: e.assets.entries.size };
+      clips: p.actions.size, assets: e.assets.entries.size,
+      meshes:worldBoxes.length, boxes:worldBoxes.slice(0,7),
+      cameraPosition:e.camera.position.toArray().map(x=>Number(x.toFixed(2))),
+      cameraTarget:[p.motion.x,p.motion.y+1.43,p.motion.z] };
   });
   console.log('Character browser metrics:', result);
   assert.ok(result.walked > 1.5, 'WASD walking did not move');
