@@ -120,7 +120,7 @@ try {
   await ready();
   await page.keyboard.press('g');
   await page.waitForFunction(
-    () => document.querySelector('#mode-label').textContent === 'GROUND LEVEL',
+    () => document.querySelector('[data-mode="ground"]').getAttribute('aria-pressed') === 'true',
   );
   await page.screenshot({ path: out + '/ground.jpg', quality: 90 });
   await page.locator('#atlas-btn').click();
