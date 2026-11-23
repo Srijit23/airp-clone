@@ -88,7 +88,7 @@ try {
   assert.equal(parked.parked, true);
   assert.equal(parked.visible, true);
   assert.equal(parked.mode, 'player');
-  assert.equal(parked.canEnter, true, 'Player must be able to approach the driver's door');
+  assert.equal(parked.canEnter, true, "Player must be able to approach the driver's door");
 
   await page.locator('#world').focus();
   await page.keyboard.press('e');
