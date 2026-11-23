@@ -231,7 +231,8 @@ export class VehicleController {
       if (probe.y <= ground.height(probe.x, probe.z) + 0.35 ||
           (building && probe.y > building.position.y &&
            probe.y < building.position.y + building.height)) {
-        desired.copy(target).lerp(desired, Math.max(0.22, (n - 1) / 16));
+        eye.copy(desired);
+        desired.copy(target).lerp(eye, Math.max(0.22, (n - 1) / 16));
         break;
       }
     }
