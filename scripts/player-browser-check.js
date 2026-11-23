@@ -117,7 +117,7 @@ try {
       cameraPosition:e.camera.position.toArray().map(x=>Number(x.toFixed(2))),
       cameraTarget:[p.motion.x,p.motion.y+1.43,p.motion.z] };
   });
-  console.log('Character browser metrics:', result);
+  console.log('Character browser metrics:', JSON.stringify(result));
   assert.ok(result.walked > 1.5, 'WASD walking did not move');
   assert.ok(result.ran > result.walked * 1.35, 'Sprint is not faster than walking');
   assert.equal(result.walkAnimation, 'Walking');
