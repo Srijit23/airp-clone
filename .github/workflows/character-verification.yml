@@ -28,6 +28,8 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - name: Syntax-check gameplay browser scripts
+        run: node --check scripts/player-browser-check.js && node --check scripts/vehicle-browser-check.js
       - run: npm test
       - run: npm run build
       - run: npx playwright-core install --with-deps chromium
