@@ -69,9 +69,14 @@ export class VehicleController {
     const yaw = controls.yaw;
     let location = null;
     for (const distance of [3.8, 4.4, 5.5, 6.7, 8, 10, 12]) {
+      // First try a clear parking spot just ahead and to one side. This keeps
+      // the car visibly framed at first spawn instead of hiding behind the map.
       for (const [lateral, ahead] of [
-        [distance, 0], [-distance, 0], [distance * 0.7, distance * 0.7],
-        [-distance * 0.7, distance * 0.7], [0, distance], [0, -distance],
+        [distance * 0.62, distance * 0.79],
+        [-distance * 0.62, distance * 0.79],
+        [0, distance], [distance * 0.75, distance * 0.65],
+        [-distance * 0.75, distance * 0.65],
+        [distance, 0], [-distance, 0], [0, -distance],
         [distance * 0.7, -distance * 0.7], [-distance * 0.7, -distance * 0.7],
       ]) {
         const position = offset(playerMotion.x, playerMotion.z, yaw, lateral, ahead);
