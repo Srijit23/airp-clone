@@ -84,8 +84,12 @@ export class InspectionCamera {
       (e) => {
         if (this.blocked) return;
         e.preventDefault();
-        if (this.mode === 'player' && this.player)
-          this.player.cameraDistance = clamp(this.player.cameraDistance * (e.deltaY < 0 ? 0.85 : 1.15), 2.3, 7.4);
+        if (this.mode === 'drive' && this.vehicle)
+          this.vehicle.cameraDistance = clamp(this.vehicle.cameraDistance *
+            (e.deltaY < 0 ? 0.86 : 1.14), 5.1, 13.5);
+        else if (this.mode === 'player' && this.player)
+          this.player.cameraDistance = clamp(this.player.cameraDistance *
+            (e.deltaY < 0 ? 0.85 : 1.15), 2.3, 7.4);
         else
           this.speed = clamp(this.speed * (e.deltaY < 0 ? 1.25 : 0.8), 4, 160);
         this.changed();
@@ -100,11 +104,20 @@ export class InspectionCamera {
     } catch {}
   }
   look(dx, dy) {
+    if (this.mode === 'drive' && this.vehicle) {
+      this.vehicle.look(dx, dy);
+      return;
+    }
     this.yaw -= dx * 0.00215;
     this.pitch = clamp(this.pitch - dy * 0.00215, -1.48, 1.48);
   }
   teleport(station) {
     this.keys.clear();
+    if (this.mode === 'drive' && this.vehicle) {
+      this.vehicle.teleport(station, this);
+      this.changed();
+      return;
+    }
     if (this.mode === 'player' && this.player) {
       this.yaw = station.yaw;
       this.pitch = clamp(Math.min(-0.18, station.pitch), -0.85, 0.3);
@@ -128,7 +141,8 @@ export class InspectionCamera {
     this.changed();
   }
   get travelSpeed() {
-    return this.mode === 'player' ? (this.player?.currentSpeed ?? 0) :
+    return this.mode === 'drive' ? Math.abs(this.vehicle?.motion?.speed || 0) :
+      this.mode === 'player' ? (this.player?.currentSpeed ?? 0) :
       this.mode === 'fly' ? this.speed : clamp(this.speed / 12, 1, 12);
   }
   height(x, z) {
@@ -140,6 +154,12 @@ export class InspectionCamera {
   }
   setMode(mode) {
     if (this.mode === mode) return;
+    // Preserve a safe exit when switching from driving to a spectator view.
+    if (this.mode === 'drive' && mode !== 'drive') {
+      this.vehicle?.exit(this);
+      if (mode === 'player') return;
+    }
+    if (mode === 'drive' && !this.vehicle?.driving) return;
     this.mode = mode;
     this.keys.clear();
     if (mode === 'player' && this.player) {
@@ -162,6 +182,10 @@ export class InspectionCamera {
   update(dt) {
     const p = this.camera.position,
       k = this.keys;
+    if (this.mode === 'drive' && this.vehicle) {
+      this.vehicle.update(dt, this);
+      return;
+    }
     if (this.mode === 'player' && this.player) {
       if (!this.blocked) {
         this.yaw += (Number(k.has('ArrowLeft')) - Number(k.has('ArrowRight'))) * dt * 1.55;
