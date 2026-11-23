@@ -1,5 +1,6 @@
 import { TextureLoader, RepeatWrapping, SRGBColorSpace } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 
 // Handles own a reference to shared GPU resources. Rejected loads can be retried.
@@ -10,6 +11,7 @@ export class AssetManager {
     this.entries = new Map();
     this.textures = new TextureLoader();
     this.models = new GLTFLoader();
+    this.draco = null;
   }
   async load(spec) {
     if (spec.type === 'texture') {
@@ -24,6 +26,14 @@ export class AssetManager {
     if (spec.meshopt) {
       const { MeshoptDecoder } = await import('three/addons/libs/meshopt_decoder.module.js');
       this.models.setMeshoptDecoder(MeshoptDecoder);
+    }
+    if (spec.draco) {
+      if (!this.draco) {
+        this.draco = new DRACOLoader();
+        this.draco.setDecoderPath(import.meta.env.BASE_URL + 'assets/draco/');
+        this.draco.setDecoderConfig({ type: 'wasm' });
+        this.models.setDRACOLoader(this.draco);
+      }
     }
     const gltf = await this.models.loadAsync(spec.url),
       resources = new Set();
@@ -55,6 +65,10 @@ export class AssetManager {
         for (const bitmap of bitmaps) bitmap.close();
       },
     };
+  }
+  dispose() {
+    this.draco?.dispose();
+    this.draco = null;
   }
   async acquire(id) {
     const spec = this.manifest[id];

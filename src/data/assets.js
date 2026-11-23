@@ -57,3 +57,22 @@ for (const species of treeSpecies) {
 
 manifest['forest-cover']={id:'forest-cover',type:'texture',category:'forest',color:false,
   url:import.meta.env.BASE_URL+'assets/trees/forest-cover.webp'};
+
+manifest['player-robot'] = {
+  id: 'player-robot',
+  type: 'gltf',
+  category: 'character',
+  url: import.meta.env.BASE_URL + 'assets/characters/robot-expressive.glb',
+  source: 'https://github.com/mrdoob/three.js/tree/master/examples/models/gltf/RobotExpressive',
+  license: 'CC0-1.0',
+};
+
+manifest['city-car'] = {
+  id: 'city-car',
+  type: 'gltf',
+  category: 'vehicle',
+  draco: true,
+  url: import.meta.env.BASE_URL + 'assets/vehicles/wedge.glb',
+  source: 'https://github.com/drcollect/collect-cars/blob/main/models/wedge.glb',
+  license: 'CC-BY-4.0',
+};

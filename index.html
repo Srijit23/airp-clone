@@ -7,7 +7,7 @@
       content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
     <meta name="theme-color" content="#192320" />
-    <title>AIRP • World Explorer</title>
+    <title>AIRP</title>
     <link rel="icon" type="image/svg+xml" href="./mark.svg" />
   </head>
   <body>
@@ -25,7 +25,7 @@
               fill="currentColor"
               d="m1 32 17-29 8 14-4 7-4-7-9 15zm16 0 15-25 14 25h-8l-6-11-6 11z"
             /></svg
-          ><strong>AIRP</strong><i></i><span>World Explorer</span>
+          ><strong>AIRP</strong>
         </div>
         <div class="compass" aria-label="Compass heading">
           <div id="compass-scale"></div>
@@ -44,16 +44,6 @@
           </button>
         </nav>
       </header>
-      <section class="place" aria-label="Current location">
-        <div class="mode-row">
-          <span class="beacon"></span><span id="mode-label">FREE FLIGHT</span
-          ><i></i><span class="muted">CITY SURVEY</span>
-        </div>
-        <h1 id="region-name">Kestrel Basin</h1>
-        <div class="location">
-          <i data-icon="pin"></i><span id="site">Ridge Overlook</span>
-        </div>
-      </section>
       <div id="reticle" aria-hidden="true"></div>
       <aside class="mini">
         <button id="mini-btn" aria-label="Open terrain atlas">
@@ -67,12 +57,14 @@
           ><span><i data-icon="speed"></i><b id="speed">48</b> m/s</span>
         </div>
       </aside>
+      <aside id="vehicle-hud" class="vehicle-hud" hidden aria-label="Vehicle dashboard">
+        <span class="vehicle-hud-label">AIRP / DRIVE</span>
+        <div><strong id="vehicle-speed">0</strong><span>km/h</span></div>
+      </aside>
+      <button id="vehicle-action" class="vehicle-action" hidden aria-label="Enter or exit car">
+        <kbd>E</kbd><span id="vehicle-action-text">Enter car</span>
+      </button>
       <footer>
-        <div class="controls">
-          <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> Move</span
-          ><span><i data-icon="mouse"></i> Click to look</span
-          ><span><kbd>Shift</kbd> Boost</span>
-        </div>
         <button class="controls-btn" id="help-btn">
           <i data-icon="keyboard"></i> Controls <kbd>?</kbd>
         </button>
@@ -86,14 +78,14 @@
         </div>
         <div>
           <button data-key="Space" aria-label="Ascend">+</button
-          ><button data-key="KeyC" aria-label="Descend">−</button>
+          ><button data-key="KeyC" aria-label="Descend">−</button><button data-key="ShiftLeft" aria-label="Run">Run</button>
         </div>
       </div>
       <output id="debug" hidden></output>
       <dialog id="panel">
         <div class="panel-head">
           <div>
-            <small>AIRP / WORLD EXPLORER</small>
+            <small>AIRP</small>
             <h2 id="panel-title"></h2>
           </div>
           <button id="close" class="square" aria-label="Close panel">
@@ -121,9 +113,9 @@
         </section>
         <section id="settings" hidden>
           <fieldset>
-            <legend>Inspection camera</legend>
+            <legend>Camera mode</legend>
             <div class="segments" id="modes">
-              <button data-mode="fly">Free flight</button
+              <button data-mode="player">Character</button><button data-mode="fly">Free flight</button
               ><button data-mode="ground">Ground level</button>
             </div>
           </fieldset>
@@ -153,8 +145,18 @@
         </section>
         <section id="help" hidden>
           <dl>
-            <dt>Move</dt>
+            <dt>Enter / exit parked car</dt>
+            <dd>E (near car)</dd>
+            <dt>Drive / steer</dt>
+            <dd>W S / A D</dd>
+            <dt>Handbrake / reverse</dt>
+            <dd>Space / S</dd>
+            <dt>Car chase camera zoom</dt>
+            <dd>Mouse wheel</dd>
+            <dt>Move character</dt>
             <dd>W A S D</dd>
+            <dt>Run / jump</dt>
+            <dd>Shift / Space</dd>
             <dt>Look around</dt>
             <dd>Click + mouse / arrow keys</dd>
             <dt>Rise / descend in flight</dt>
@@ -163,6 +165,8 @@
             <dd>Shift</dd>
             <dt>Adjust speed</dt>
             <dd>Mouse wheel</dd>
+            <dt>Character / spectator</dt>
+            <dd>V</dd>
             <dt>Flight / ground camera</dt>
             <dd>G</dd>
             <dt>Open atlas</dt>
@@ -171,14 +175,23 @@
             <dd>F3</dd>
             <dt>Release mouse / close</dt>
             <dd>Esc</dd>
+            <dt>Sports car asset credit</dt>
+            <dd><a href="./assets/vehicles/SOURCES.md" target="_blank" rel="noopener">Model and CC BY 4.0 license</a></dd>
             <dt>Showcase tree models</dt>
             <dd><a href="./assets/trees/CREDITS.txt" target="_blank" rel="noopener">Artist credits and license</a></dd>
           </dl>
         </section>
       </dialog>
-      <div id="curtain" role="status">
-        <span class="beacon"></span
-        ><span id="status">Loading Kestrel Basin…</span>
+      <div id="curtain" role="status" aria-live="polite">
+        <div class="loading-brand">
+          <svg class="loading-mark" viewBox="0 0 46 38" aria-hidden="true">
+            <path fill="currentColor" d="m1 32 17-29 8 14-4 7-4-7-9 15zm16 0 15-25 14 25h-8l-6-11-6 11z"/>
+          </svg>
+          <strong>AIRP</strong>
+          <span class="loading-rule" aria-hidden="true"></span>
+          <span id="status">Loading AIRP…</span>
+          <span class="loading-progress" aria-hidden="true"></span>
+        </div>
       </div>
     </main>
     <script type="module" src="./src/main.js"></script>

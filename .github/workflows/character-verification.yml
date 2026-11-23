@@ -1,0 +1,50 @@
+name: AIRP character and vehicle verification
+on:
+  push:
+    branches: [ui/airp-game-ready-cleanup]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'public/assets/characters/**'
+      - 'public/assets/vehicles/**'
+      - 'scripts/player-browser-check.js'
+      - 'scripts/vehicle-browser-check.js'
+      - 'test/**'
+      - '.github/workflows/character-verification.yml'
+permissions:
+  contents: read
+concurrency:
+  group: airp-gameplay-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Syntax-check gameplay browser scripts
+        run: node --check scripts/player-browser-check.js && node --check scripts/vehicle-browser-check.js
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright-core install --with-deps chromium
+      - name: Verify animated character in Chromium
+        run: node scripts/player-browser-check.js
+        env:
+          AIRP_SOFTWARE_GL: '1'
+      - name: Verify car driving in Chromium
+        run: node scripts/vehicle-browser-check.js
+        env:
+          AIRP_SOFTWARE_GL: '1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gameplay-browser-captures
+          path: |
+            test-results/player/
+            test-results/vehicles/
