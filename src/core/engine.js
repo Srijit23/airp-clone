@@ -20,6 +20,7 @@ import { Atmosphere } from '../environment/atmosphere.js';
 import { WorldStreamer } from '../world/streamer.js';
 import { InspectionCamera } from '../debug/camera.js';
 import { InspectionPanel } from '../debug/panel.js';
+import { CharacterController } from '../player/controller.js';
 
 export class Engine {
   constructor(canvas, fail) {
@@ -63,17 +64,22 @@ export class Engine {
     this.showcase = new TreeShowcase(this.scene, this.assets, this.fail);
     this.forest = new ForestLayer(this.scene, this.assets, this.fail);
     this.water=new SouthSound(this.scene);
+    this.player = new CharacterController(this.scene, this.assets, this.places, this.forest, this.streamer);
+    await this.player.load();
     this.controls = new InspectionCamera(
       this.camera,
       this.canvas,
       this.streamer,
       () => this.ui?.refresh(),
     );
+    this.player.connect(this.controls);
+    this.controls.player = this.player;
     this.controls.obstacle=(x,z)=>buildingAt(x,z,.25);
     this.controls.streetSurface = (x, z, base) =>
       Math.max(this.roads.surfaceHeight(x,z,base),promenadeHeight(x,z)??-Infinity);
     this.quality('medium');
     this.controls.teleport(stations.find((s) => s.id === 'meridian'));
+    this.controls.setMode('player');
     this.ui = new InspectionPanel(this);
     this.frames = 0;
     this.period = 0;
@@ -135,6 +141,10 @@ export class Engine {
         this.camera.position,
         this.streamer.loads + this.streamer.unloads + this.roads.revision+this.places.revision + this.showcase.revision + this.forest.revision,
       );
+      if (this.player?.shadowDirty && time - (this.lastCharacterShadow || 0) > 120) {
+        this.atmosphere.sun.shadow.needsUpdate = true;
+        this.lastCharacterShadow = time;
+      }
       this.renderer.render(this.scene, this.camera);
       this.frames++;
       this.period += elapsed;
@@ -164,6 +174,7 @@ export class Engine {
     this.canvas.removeEventListener('webglcontextlost', this.contextLost);
     this.ui?.dispose();
     this.controls?.dispose();
+    this.player?.dispose();
     this.streamer?.dispose();
     this.roads?.dispose();
     this.showcase?.clear();
