@@ -21,6 +21,7 @@ import { WorldStreamer } from '../world/streamer.js';
 import { InspectionCamera } from '../debug/camera.js';
 import { InspectionPanel } from '../debug/panel.js';
 import { CharacterController } from '../player/controller.js';
+import { VehicleController } from '../vehicles/controller.js';
 
 export class Engine {
   constructor(canvas, fail) {
@@ -74,12 +75,17 @@ export class Engine {
     );
     this.player.connect(this.controls);
     this.controls.player = this.player;
+    this.vehicle = new VehicleController(this.scene, this.assets, this.player);
+    await this.vehicle.load();
+    this.controls.vehicle = this.vehicle;
+    this.player.world.vehicle = this.vehicle;
     this.controls.obstacle=(x,z)=>buildingAt(x,z,.25);
     this.controls.streetSurface = (x, z, base) =>
       Math.max(this.roads.surfaceHeight(x,z,base),promenadeHeight(x,z)??-Infinity);
     this.quality('medium');
     this.controls.teleport(stations.find((s) => s.id === 'meridian'));
     this.controls.setMode('player');
+    this.vehicle.spawnNear(this.player.motion, this.controls);
     this.ui = new InspectionPanel(this);
     this.frames = 0;
     this.period = 0;
@@ -141,7 +147,8 @@ export class Engine {
         this.camera.position,
         this.streamer.loads + this.streamer.unloads + this.roads.revision+this.places.revision + this.showcase.revision + this.forest.revision,
       );
-      if (this.player?.shadowDirty && time - (this.lastCharacterShadow || 0) > 120) {
+      if ((this.player?.shadowDirty || this.vehicle?.shadowDirty) &&
+          time - (this.lastCharacterShadow || 0) > 120) {
         this.atmosphere.sun.shadow.needsUpdate = true;
         this.lastCharacterShadow = time;
       }
@@ -174,6 +181,7 @@ export class Engine {
     this.canvas.removeEventListener('webglcontextlost', this.contextLost);
     this.ui?.dispose();
     this.controls?.dispose();
+    this.vehicle?.dispose();
     this.player?.dispose();
     this.streamer?.dispose();
     this.roads?.dispose();
