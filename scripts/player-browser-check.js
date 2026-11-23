@@ -57,6 +57,11 @@ try {
     const e = window.airp, c = e.controls, p = e.player;
     const { buildingAt, buildings } = await import('/src/places/records.js');
     const start = { ...p.motion };
+    // The new parked car is intentionally in the player's path.
+    // Exclude that single collider while measuring raw walk/sprint speeds;
+    // the vehicle browser test separately verifies parked-car collision.
+    const parked = e.vehicle?.parked;
+    if (e.vehicle) e.vehicle.parked = false;
     c.keys.clear();
     const before = { x: p.motion.x, z: p.motion.z };
     c.keys.add('KeyW');
@@ -81,6 +86,7 @@ try {
     }
     c.keys.clear();
     const landed = p.motion.grounded && Math.abs(p.motion.y - p.world.height(p.motion.x, p.motion.z)) < 0.001;
+    if (e.vehicle) e.vehicle.parked = parked;
     const building = buildings.find(b => buildingAt(b.position.x, b.position.z) === b);
     const blocked = p.world.blocked(building.position.x, building.position.z, building.position.y);
     const placedSolid = e.places.lots.flatMap(lot => lot.parts).find(part =>
