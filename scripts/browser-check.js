@@ -220,6 +220,13 @@ try {
         forestGeometries.add(mesh.geometry);
         for(const v of Object.values(mesh.material))if(v?.isTexture)forestTextures.add(v);
       }
+      const playerGeometries = new Set(), playerTextures = new Set();
+      e.player.model.traverse(mesh => {
+        if (mesh.geometry) playerGeometries.add(mesh.geometry);
+        for (const material of [].concat(mesh.material || []))
+          for (const value of Object.values(material || {}))
+            if (value?.isTexture) playerTextures.add(value);
+      });
       snapshots.push([
         s.tiles.size,
         s.sectors.size,
@@ -229,6 +236,7 @@ try {
         new Set([...e.places.models.values()].map(m=>m.geometry)).size,
         [...e.assets.entries.keys()].filter(id=>e.assets.manifest[id].type==='texture').length,
         forestGeometries.size,forestTextures.size+1,e.forest.stats.instances,
+        playerGeometries.size,playerTextures.size,
       ]);
     }
     e.controls.setMode('ground');
@@ -284,7 +292,7 @@ try {
   assert.deepEqual(route.snapshots[4], route.snapshots.at(-1));
   assert.ok(
     route.snapshots.every(
-      (p) => p[2] <= p[0]+p[1]+p[4]+p[5]+2+p[7] && p[3] <= p[6]+6+p[8],
+      (p) => p[2] <= p[0]+p[1]+p[4]+p[5]+2+p[7]+p[10] && p[3] <= p[6]+6+p[8]+p[11],
     ),
   );
   assert.ok(route.cellCache<=140);
