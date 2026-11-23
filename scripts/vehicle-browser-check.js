@@ -49,7 +49,7 @@ try {
   await page.goto(url(prod));
   await ready('Production');
   assert.equal(await page.title(), 'AIRP');
-  assert.equal(await page.locator('#vehicle-action').isVisible(), false);
+  assert.equal(await page.locator('#vehicle-action').isVisible(), true);
   // Production GLB is actually available inside the bundled Netlify-style site.
   await page.waitForTimeout(350);
   await page.screenshot({ path: 'test-results/vehicles/parked-production.jpg', quality: 84 });
